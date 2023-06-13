@@ -7,23 +7,21 @@ const mongoose = require('mongoose');
 const EmployeeSkills = mongoose.model('Employeeskills');
 const Skill = mongoose.model('Skill');
 
-// Retrieve employee skills
+// // Retrieve employee skills
 router.get('/employeeskills', async (req, res) => {
   try {
-    const { email } = req.query;
-
-    const employeeSkills = await EmployeeSkills.findOne({ email });
-
-    if (employeeSkills) {
-      res.json(employeeSkills);
-    } else {
-      res.json({ primarySkill: null, secondarySkills: [] });
-    }
-  } catch (error) {
-    console.error('Error retrieving employee skills:', error);
-    res.status(500).json({ error: 'Failed to retrieve employee skills.' });
-  }
-});
+     const { email } = req.query;
+     const employeeSkills = await EmployeeSkills.findOne({ email });
+     if (employeeSkills) {
+       res.json(employeeSkills);
+     } else {
+       res.json({ primarySkill: null, secondarySkills: [] });
+     }
+   } catch (error) {
+     console.error('Error retrieving employee skills:', error);
+     res.status(500).json({ error: 'Failed to retrieve employee skills.' });
+   }
+ });
 
 
 
