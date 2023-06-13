@@ -8,20 +8,20 @@ const EmployeeSkills = mongoose.model('Employeeskills');
 const Skill = mongoose.model('Skill');
 
 // // Retrieve employee skills
-router.get('/employeeskills', async (req, res) => {
-  try {
-     const { email } = req.query;
-     const employeeSkills = await EmployeeSkills.findOne({ email });
-     if (employeeSkills) {
-       res.json(employeeSkills);
-     } else {
-       res.json({ primarySkill: null, secondarySkills: [] });
-     }
-   } catch (error) {
-     console.error('Error retrieving employee skills:', error);
-     res.status(500).json({ error: 'Failed to retrieve employee skills.' });
-   }
- });
+// router.get('/employeeskills', async (req, res) => {
+//   try {
+//      const { email } = req.query;
+//      const employeeSkills = await EmployeeSkills.findOne({ email });
+//      if (employeeSkills) {
+//        res.json(employeeSkills);
+//      } else {
+//        res.json({ primarySkill: null, secondarySkills: [] });
+//      }
+//    } catch (error) {
+//      console.error('Error retrieving employee skills:', error);
+//      res.status(500).json({ error: 'Failed to retrieve employee skills.' });
+//    }
+//  });
 
 
 
@@ -37,10 +37,13 @@ router.post('/primary', async (req, res) => {
     const employeeSkills = await EmployeeSkills.findOne({ email });
 
     if (employeeSkills) {
-      const skill = await Skill.findOne({ name: primarySkill.skillName });
+      const skill = await Skill.findById(primarySkill.skillId);
       if (skill) {
-        primarySkill.skillName = skill.name;
-        employeeSkills.primarySkill = primarySkill;
+        employeeSkills.primarySkill = {
+          skillId: skill._id,
+          yearsOfExperience: primarySkill.yearsOfExperience,
+          certification: primarySkill.certification,
+        };
         await employeeSkills.save();
         res.json({ message: 'Primary skill saved successfully.' });
       } else {
@@ -49,7 +52,11 @@ router.post('/primary', async (req, res) => {
     } else {
       const newEmployeeSkills = new EmployeeSkills({
         email,
-        primarySkill,
+        primarySkill: {
+          skillId: primarySkill.skillId,
+          yearsOfExperience: primarySkill.yearsOfExperience,
+          certification: primarySkill.certification,
+        },
       });
       await newEmployeeSkills.save();
       res.json({ message: 'Primary skill saved successfully.' });
@@ -68,9 +75,9 @@ router.post('/secondary', async (req, res) => {
 
     if (employeeSkills) {
       for (const secondarySkill of secondarySkills) {
-        const skill = await Skill.findOne({ name: secondarySkill.skillName });
+        const skill = await Skill.findById(secondarySkill.skillId);
         if (skill) {
-          secondarySkill.skillName = skill.name;
+          secondarySkill.skillId = skill._id;
         } else {
           res.status(404).json({ error: 'Skill not found.' });
           return;
@@ -82,7 +89,11 @@ router.post('/secondary', async (req, res) => {
     } else {
       const newEmployeeSkills = new EmployeeSkills({
         email,
-        secondarySkills,
+        secondarySkills: secondarySkills.map(skill => ({
+          skillId: skill.skillId,
+          yearsOfExperience: skill.yearsOfExperience,
+          certification: skill.certification,
+        })),
       });
       await newEmployeeSkills.save();
       res.json({ message: 'Secondary skills saved successfully.' });
@@ -92,5 +103,6 @@ router.post('/secondary', async (req, res) => {
     res.status(500).json({ error: 'Failed to save secondary skills.' });
   }
 });
+
 
 module.exports = router;
