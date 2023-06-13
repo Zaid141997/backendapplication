@@ -1,14 +1,15 @@
 
 const mongoose = require('mongoose');
-
+const Skill = mongoose.model('Skill');
 const employeeSkillsSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
   },
   primarySkill: {
-    skillName: {
-      type: String,
+    skillId: {
+      type: mongoose.Schema.Types.ObjectId, // Update the type to reference the Skill model's ID
+      ref: 'Skill', // Reference the Skill model
       required: true,
     },
     yearsOfExperience: {
@@ -21,8 +22,9 @@ const employeeSkillsSchema = new mongoose.Schema({
   },
   secondarySkills: [
     {
-      skillName: {
-        type: String,
+      skillId: {
+        type: mongoose.Schema.Types.ObjectId, // Update the type to reference the Skill model's ID
+        ref: 'Skill', // Reference the Skill model
         required: true,
       },
       yearsOfExperience: {
@@ -37,7 +39,6 @@ const employeeSkillsSchema = new mongoose.Schema({
 });
 
  mongoose.model('Employeeskills', employeeSkillsSchema);
-
 
 
 

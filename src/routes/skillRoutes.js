@@ -31,54 +31,6 @@ res.status(400).json({ error: err.message });
 });
 
 
-router.put('/skills/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, description } = req.body;
-  
-    try {
-      const skill = await Skill.findByIdAndUpdate(id, { name, description }, { new: true });
-      if (!skill) {
-        return res.status(404).json({ message: 'Skill not found' });
-      }
-  
-      // Update the skill name in the Employeeskills collection
-      await EmployeeSkills.updateMany(
-        { 'primarySkill.skillName': skill.name },
-        { $set: { 'primarySkill.skillName': name } }
-      );
-  
-      await EmployeeSkills.updateMany(
-        { 'secondarySkills.skillName': skill.name },
-        { $set: { 'secondarySkills.$[elem].skillName': name } },
-        { arrayFilters: [{ 'elem.skillName': skill.name }] }
-      );
-  
-      res.json(skill);
-    } catch (err) {
-      res.status(400).json({ error: err.message });
-    }
-  });
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -88,20 +40,20 @@ router.put('/skills/:id', async (req, res) => {
 
 
 // Update a skill
-// router.put('/skills/:id', async (req, res) => {
-// const { id } = req.params;
-// const { name, description } = req.body;
+ router.put('/skills/:id', async (req, res) => {
+ const { id } = req.params;
+ const { name, description } = req.body;
 
-// try {
-// const skill = await Skill.findByIdAndUpdate(id, { name, description }, { new: true });
-// if (!skill) {
-// return res.status(404).json({ message: 'Skill not found' });
-// }
-// res.json(skill);
-// } catch (err) {
-// res.status(400).json({ error: err.message });
-// }
-// });
+ try {
+ const skill = await Skill.findByIdAndUpdate(id, { name, description }, { new: true });
+ if (!skill) {
+ return res.status(404).json({ message: 'Skill not found' });
+ }
+ res.json(skill);
+ } catch (err) {
+ res.status(400).json({ error: err.message });
+ }
+ });
 
 // Delete a skill
 router.delete('/skills/:id', async (req, res) => {
